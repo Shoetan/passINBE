@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+
 	"github.com/gorilla/mux"
 	"github.com/shoetan/passIn/types"
 	"github.com/shoetan/passIn/utils"
@@ -12,7 +13,8 @@ import (
 
 type recordResponse struct {
 	UserId     int    `json:"user_id"`
-	RecordName string `json:"record"`
+	RecordName string `json:"record_name"`
+	RecordEmail string `json:"record_email"`
 }
 
 func AddRecord(db *sql.DB) http.HandlerFunc {
@@ -41,8 +43,6 @@ func AddRecord(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-
-
 		id := mux.Vars(r)["id"]
 		userID, err := strconv.Atoi(id)
 		if err != nil {
@@ -52,7 +52,7 @@ func AddRecord(db *sql.DB) http.HandlerFunc {
 
 		// Check if the user exists
 		var existingUserID int
-		err = db.QueryRow("SELECT user_id FROM vault WHERE user_id = $1", userID).Scan(&existingUserID)
+		err = db.QueryRow("SELECT user_id FROM users WHERE user_id = $1", userID).Scan(&existingUserID)
 		switch {
 		case err == sql.ErrNoRows:
 			http.Error(w, "User does not exist", http.StatusBadRequest)
@@ -69,7 +69,7 @@ func AddRecord(db *sql.DB) http.HandlerFunc {
 		
 
 		// Insert record into the database
-		_, err = db.Exec("INSERT INTO vault (user_id, record_name, record_password) VALUES ($1, $2, $3)", userID, recordPayload.RecordName, encryptedPwd)
+		_, err = db.Exec("INSERT INTO vault (user_id, record_name, record_password, record_email) VALUES ($1, $2, $3, $4)", userID, recordPayload.RecordName, encryptedPwd, recordPayload.RecordEmail)
 		if err != nil {
 			http.Error(w, "Failed to insert record", http.StatusInternalServerError)
 			return
@@ -78,6 +78,7 @@ func AddRecord(db *sql.DB) http.HandlerFunc {
 		recordResp := recordResponse{
 			UserId:     userID,
 			RecordName: recordPayload.RecordName,
+			RecordEmail: recordPayload.RecordEmail,
 		}
 
 		w.WriteHeader(http.StatusCreated)
