@@ -18,6 +18,7 @@ type User struct {
 }
 
 type LoginResponse struct {
+	UserID int `json:"user_id"`
 	Email string `json:"email"`
 	Token string `json:"token"`
 }
@@ -30,7 +31,7 @@ type RegisterPayload struct {
 }
 
 type AddRecordPayload struct {
-	UserId int `json:"user_id"`
+	RecordEmail string `json:"record_email"`
 	RecordName string `json:"record_name"`
 	RecordPassword string `json:"record_password"`
 }

@@ -17,9 +17,10 @@ func Login(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		row := db.QueryRow("SELECT email, master_password FROM users WHERE email = $1", loginPayload.Email)
+		row := db.QueryRow("SELECT email, master_password, user_id FROM users WHERE email = $1", loginPayload.Email)
 		var email, masterPassword string
-		if err := row.Scan(&email, &masterPassword); err != nil {
+		var userId int
+		if err := row.Scan(&email, &masterPassword, &userId); err != nil {
 			if err == sql.ErrNoRows {
 				http.Error(w, "User not found", http.StatusNotFound)
 				return
@@ -40,6 +41,7 @@ func Login(db *sql.DB) http.HandlerFunc {
 		}
 
 		response := types.LoginResponse{
+			UserID: userId,
 			Email: email,
 			Token: token,
 		}
