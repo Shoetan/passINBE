@@ -16,6 +16,7 @@ type RecordDetails struct {
 	UserId uint `json:"user_id"`
 	RecordName string `json:"record_name"`
 	RecordPassword string `json:"record_password"`
+	RecordEmail string `json:"record_email"`
 }
 
 
@@ -56,7 +57,7 @@ func GetRecords(db * sql.DB) http.HandlerFunc{
 		for rows.Next(){
 			var r RecordDetails
 
-			if err := rows.Scan(&r.ID, &r.UserId, &r.RecordName, &r.RecordPassword); err != nil {
+			if err := rows.Scan(&r.ID, &r.UserId, &r.RecordName, &r.RecordPassword, &r.RecordEmail); err != nil {
 				fmt.Println(err)
 			}
 
@@ -69,6 +70,7 @@ func GetRecords(db * sql.DB) http.HandlerFunc{
 				UserId: r.UserId,
 				RecordName: r.RecordName,
 				RecordPassword: decry,
+				RecordEmail: r.RecordEmail,
 			}
 
 			records = append(records, recordResponse)

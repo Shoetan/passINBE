@@ -10,7 +10,7 @@ func EnableCors(next http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 
 			// Set the allowed methods for CORS requests
-			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
 
 			// Set the allowed headers for CORS requests
 			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
