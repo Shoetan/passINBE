@@ -44,6 +44,10 @@ func PatchRecord(db *sql.DB)http.HandlerFunc{
 			return
 		}
 
+		var keyphrase = []byte(utils.GetSecretKey("KEY_PHRASE"))
+
+		encryptedPwd := utils.EncryptPassword([]byte(recordPayload.RecordPassword), string(keyphrase))
+
 		id:=mux.Vars(r)["id"]
 
 		recordId, _ := strconv.Atoi(id)
@@ -63,7 +67,7 @@ func PatchRecord(db *sql.DB)http.HandlerFunc{
 			return
 		}
 
-		_, err = db.Exec("UPDATE vault SET record_name =$1, record_password=$2, record_email=$3 WHERE record_id = $4",recordPayload.RecordName, recordPayload.RecordPassword, recordPayload.RecordEmail, recordId  )
+		_, err = db.Exec("UPDATE vault SET record_name =$1, record_password=$2, record_email=$3 WHERE record_id = $4",recordPayload.RecordName, encryptedPwd, recordPayload.RecordEmail, recordId  )
 
 		if err != nil{
 			http.Error(w, "Failed to update record", http.StatusInternalServerError)

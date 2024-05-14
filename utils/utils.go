@@ -101,7 +101,13 @@ func DecryptPassword(ciphered []byte, keyPhrase string)[]byte{
 	}
 
 	nonceSize := gcmInstance.NonceSize()
-	nonce, cipheredText := ciphered[:nonceSize], ciphered[nonceSize:]
+
+	if len(ciphered) < nonceSize {
+    log.Fatalln("Ciphered text is too short")
+}
+
+nonce, cipheredText := ciphered[:nonceSize], ciphered[nonceSize:]
+
 
 	plainPwd, err := gcmInstance.Open(nil, nonce, cipheredText, nil)
 	if err != nil {
@@ -111,27 +117,3 @@ func DecryptPassword(ciphered []byte, keyPhrase string)[]byte{
 
 }
 
-/* func DecryptPassword(ciphered []byte, keyPhrase string) []byte {
-	aesBlock, err := aes.NewCipher([]byte(keyPhrase))
-	if err != nil {
-			log.Fatal(err)
-	}
-
-	gcmInstance, err := cipher.NewGCM(aesBlock)
-	if err != nil {
-			log.Fatal(err)
-	}
-
-	nonceSize := gcmInstance.NonceSize()
-	if len(ciphered) < nonceSize {
-			log.Fatal("ciphered text is too short")
-	}
-
-	nonce, cipheredText := ciphered[:nonceSize], ciphered[nonceSize:]
-
-	plainPwd, err := gcmInstance.Open(nil, nonce, cipheredText, nil)
-	if err != nil {
-			log.Fatal(err)
-	}
-	return plainPwd
-} */
