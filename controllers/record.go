@@ -12,7 +12,7 @@ import (
 )
 
 type recordResponse struct {
-	UserId     int    `json:"user_id"`
+	RecordId     int    `json:"record_id"`
 	RecordName string `json:"record_name"`
 	RecordEmail string `json:"record_email"`
 }
@@ -51,7 +51,7 @@ func AddRecord(db *sql.DB) http.HandlerFunc {
 		}
 
 		// Check if the user exists
-		var existingUserID int
+		var existingUserID, recordID int
 		err = db.QueryRow("SELECT user_id FROM users WHERE user_id = $1", userID).Scan(&existingUserID)
 		switch {
 		case err == sql.ErrNoRows:
@@ -69,14 +69,16 @@ func AddRecord(db *sql.DB) http.HandlerFunc {
 		
 
 		// Insert record into the database
-		_, err = db.Exec("INSERT INTO vault (user_id, record_name, record_password, record_email) VALUES ($1, $2, $3, $4)", userID, recordPayload.RecordName, encryptedPwd, recordPayload.RecordEmail)
+		err = db.QueryRow("INSERT INTO vault (user_id, record_name, record_password, record_email) VALUES ($1, $2, $3, $4) RETURNING record_id", userID, recordPayload.RecordName, encryptedPwd, recordPayload.RecordEmail).Scan(&recordID)
+
+
 		if err != nil {
 			http.Error(w, "Failed to insert record", http.StatusInternalServerError)
 			return
 		}
 
 		recordResp := recordResponse{
-			UserId:     userID,
+			RecordId: recordID,
 			RecordName: recordPayload.RecordName,
 			RecordEmail: recordPayload.RecordEmail,
 		}
