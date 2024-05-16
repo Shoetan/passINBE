@@ -29,8 +29,11 @@ func main() {
 
 	router.HandleFunc("/api/record/{id}", controllers.AddRecord(db)).Methods("POST")
 
-	router.HandleFunc("/api/records", controllers.GetRecords(db)).Methods("GET")
+	router.HandleFunc("/api/records/{id}", controllers.GetRecords(db)).Methods("GET")
+
 	router.HandleFunc("/api/updateRecord/{id}", controllers.PatchRecord(db)).Methods("PATCH")
+
+	router.HandleFunc("/api/deleteRecord/{id}", controllers.DeleteRecord(db)).Methods("DELETE")
 
 	fmt.Println("Server is Running on port 3001")
 

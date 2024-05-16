@@ -5,7 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	//"strings"
+	"strconv"
+	"github.com/gorilla/mux"
 
 	"github.com/shoetan/passIn/utils"
 )
@@ -41,9 +42,16 @@ func GetRecords(db * sql.DB) http.HandlerFunc{
 			return
 		}
 
+		id := mux.Vars(r)["id"]
+		userID, err := strconv.Atoi(id)
+		if err != nil {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			return
+		}
+
 		var keyphrase = []byte(utils.GetSecretKey("KEY_PHRASE"))
 
-		rows, err := db.Query("SELECT * FROM vault")
+		rows, err := db.Query("SELECT * FROM vault WHERE user_id = $1", userID)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
