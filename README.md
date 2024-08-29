@@ -21,4 +21,5 @@ Rest API for password manager powering the storing and retrieval of records in a
 ## How it works 
 Registration endpoint takes a body as JSON of name, email, and password. The password is hashed using the SHA 256 algorithm to ensure safety.
 
-![users table](./resource/user table.png)
+![Login page](./resource/usertable.png)
+
